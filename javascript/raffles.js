@@ -21,7 +21,7 @@ export const enterRaffle = async (req, res) => {
         const alreadyUsedTransaction = await UsedTransactionsSchema.findOne({ transactionSignature: signature })
         if (alreadyUsedTransaction) return res.json({ error: "Already Used Transaction." })
         if (raffleEntryTypeInRaffle.type === "SOL") {
-            const connection = new Connection('https://wider-falling-firefly.solana-mainnet.discover.quiknode.pro/9bcba0c1c16d1435fe07126ee2790a679cdd78aa/')
+            const connection = new Connection('https://wider-falling-firefly.solana-mainnet.discover.quiknode.pro/9bcba0c1c16d1435fe07126ee2790a679cdd78aa')
             let transaction = await connection.getParsedTransaction(signature, 'confirmed')
             if (!transaction) transaction = await connection.getParsedTransaction(signature, 'finalized')
             if (!transaction) return res.json({ error: `Transaction not found.` })
