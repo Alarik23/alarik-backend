@@ -1,4 +1,5 @@
 import { clusterApiUrl, Connection, LAMPORTS_PER_SOL } from "@solana/web3.js"
+import ProjectsSchema from "../database/projectsSchema.js"
 import RaffleEntrySchema from "../database/raffles/raffleEntrySchema.js"
 import RaffleSchema from "../database/raffles/rafflesSchema.js"
 import UsedTransactionsSchema from "../database/usedTransactions.js"
@@ -21,7 +22,8 @@ export const enterRaffle = async (req, res) => {
         const alreadyUsedTransaction = await UsedTransactionsSchema.findOne({ transactionSignature: signature })
         if (alreadyUsedTransaction) return res.json({ error: "Already Used Transaction." })
         if (raffleEntryTypeInRaffle.type === "SOL") {
-            const connection = new Connection('https://wider-falling-firefly.solana-mainnet.discover.quiknode.pro/9bcba0c1c16d1435fe07126ee2790a679cdd78aa')
+            const connection = new Connection('https://wider-falling-firefly.solana-mainnet.discover.quiknode.pro/9bcba0c1c16d1435fe07126ee2790a679cdd78aa/')
+            // const connection = new Connection(clusterApiUrl('mainnet-beta'))
             let transaction = await connection.getParsedTransaction(signature, 'confirmed')
             if (!transaction) transaction = await connection.getParsedTransaction(signature, 'finalized')
             if (!transaction) return res.json({ error: `Transaction not found.` })
@@ -68,16 +70,15 @@ export const enterRaffle = async (req, res) => {
         return res.json({ error: "Server Error" })
     }
 }
-export const checkTransaction = async (signature) => {
-
-}
 export const getRaffles = async (req, res) => {
     try {
-        console.log(req.body)
         const projectId = req.body.projectId
         const walletAddress = req.body.walletAddress
         if (!projectId) return res.json({ error: "Argument Error" })
         else {
+            const project = await ProjectsSchema.findOne({id: projectId})
+            if(!project) return res.json({error: 'Project not found'})
+            if(project.raffleEnabled !== true) return res.json({error: `Raffle is locked for this project.`})
             const rafflesData = await RaffleSchema.find({ projectId: projectId })
             const raffles = []
             for (const raffle of rafflesData) {

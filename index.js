@@ -16,17 +16,19 @@ app.post('/create-project', async (req, res) => {
     await createProject(req, res)
 })
 
-app.post('/get-project', async(req, res) => {
+app.post('/get-project', async (req, res) => {
     await getProject(req, res)
 })
 
-app.post('/get-raffles', async(req, res) => {
+app.post('/get-raffles', async (req, res) => {
     await getRaffles(req, res)
 })
 
-app.post('/enter-raffle', async(req, res) => {
+app.post('/enter-raffle', async (req, res) => {
     await enterRaffle(req, res)
 })
+
+
 app.listen('8080', () => {
     console.log("Listening to http://localhost:8080/")
 })
