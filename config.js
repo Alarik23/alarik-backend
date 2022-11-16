@@ -6,4 +6,5 @@ const config = {
     newProjectLogo: "e",
     mongoUri: 'mongodb+srv://Alarik:AlarikNft.3486@cluster0.4j9uvrx.mongodb.net/?retryWrites=true&w=majority'
 }
+
 export default config
