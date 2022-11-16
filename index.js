@@ -36,7 +36,6 @@ app.post('/get-staking-info', async (req, res) => {
     const response = await getStakingAccountInfo(req.body)
     return res.json(response)
 })
-
 app.post('/stake-nfts', async (req, res) => {
     const response = await stakeNft(req.body)
     return res.json(response)
