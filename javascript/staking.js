@@ -158,6 +158,7 @@ export const getStakingAccountInfo = async (req) => {
         nftsOfCollection = await Promise.all(nftsOfCollection.map(async x => {
             const nftImage = await MintListSchema.findOne({ mint: x.mintAddress })
             x.image = nftImage.imageURL
+            x.stakingOptions = nftImage.stakingOptions
             return x
         }))
         const yourStaked = nftsOfCollection.filter(y => totalStaked.find(x => x.mint === y.mintAddress.toString()))

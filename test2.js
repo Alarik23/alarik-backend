@@ -8,6 +8,11 @@ import mintsHashList from './mintHashlist.js'
 import { Connection, PublicKey } from "@solana/web3.js";
 import { Metaplex } from "@metaplex-foundation/js";
 import MintListSchema from "./database/staking/MintList.js";
+updateMintHashList()
+export const sleep = (time) => {
+    return new Promise((resolve) => setTimeout(resolve, time));
+}
+
 async function updateMintHashList() {
     const projectId = 'fomofoxes'
     let mints = mintsHashList.map(x => new PublicKey(x))
@@ -17,19 +22,48 @@ async function updateMintHashList() {
     const nftsData = await metaplex.nfts().findAllByMintList({ mints: mints })
     const nftsMintData = []
     var i = 0
-    for (const nft of nftsData) {
+    await Promise.all(nftsData.map(async nft => {
         i++
-        if (nft) {
-            const nftJson = await metaplex.nfts().load({ metadata: nft });
-            console.log(i)
-            nftsMintData.push({
-                projectId: projectId,
-                mint: nftJson.mint.address.toString(),
-                imageURL: nftJson.json.image
-            })
-            console.log(nftsMintData)
+        try {
+            await sleep(i*150)
+            await loadNft(nft)
+        } catch {
+            await loadNft(nft)
         }
-    }
+        async function loadNft(nft) {
+            if (nft) {
+                const nftJson = await metaplex.nfts().load({ metadata: nft });
+                if (nftJson.json) {
+                    const skinTrait = nftJson.json.attributes.find(y => y.trait_type === 'Skin')
+                    console.log(skinTrait)
+                    // if (skinTrait && skinTrait.value === 'WOOD') {
+                    //     nftsMintData.push({
+                    //         projectId: projectId,
+                    //         mint: nftJson.mint.address.toString(),
+                    //         imageURL: nftJson.json.image,
+                    //         stakingOptions: [
+                    //             {
+                    //                 "currency": "$PAW",
+                    //                 "type": "token",
+                    //                 "amount": 1.5,
+                    //                 "tokenId": "1812eccf992226e2bcfb3231572388d7",
+                    //                 "planId": "4d0a650b7c70e0f732ef322da4b22139"
+                    //             }
+                    //         ],
+                    //     })
+                    // } else {
+                        nftsMintData.push({
+                            projectId: projectId,
+                            mint: nftJson.mint.address.toString(),
+                            imageURL: nftJson.json.image
+                        })
+                    // }
+                    console.log(nftsMintData.length)
+                }
+            }
+        }
+
+    }))
     await MintListSchema.insertMany(nftsMintData)
 }
 async function updateId(idToUpdate2) {
@@ -40,24 +74,22 @@ async function updateId(idToUpdate2) {
     })
 }
 async function createStakingProject() {
-    const projectId = 'fomofoxes'
+    const projectId = 'zalez'
     const tokenId = crypto.randomBytes(16).toString('hex')
     const stakingOptions = [
         {
             optionId: crypto.randomBytes(16).toString('hex'),
-            rewards: [{ currency: 'SOL', rewardType: 'APR', amount: 17, planId: crypto.randomBytes(16).toString('hex') }, { currency: '$FOMO', type: 'token', amount: 100, tokenId: tokenId, planId: crypto.randomBytes(16).toString('hex') }],
+            rewards: [
+                { currency: '$PAW', type: 'token', amount: 1, tokenId: tokenId, planId: crypto.randomBytes(16).toString('hex') }
+            ],
             interval: 1 * 24 * 60 * 60 * 1000
         },
-        {
-            optionId: crypto.randomBytes(16).toString('hex'),
-            rewards: [{ currency: 'SOL', rewardType: 'APR', amount: 20, planId: crypto.randomBytes(16).toString('hex') }, { currency: '$FOMO', type: 'token', amount: 200, tokenId: tokenId, planId: crypto.randomBytes(16).toString('hex') }],
-            interval: 7 * 24 * 60 * 60 * 1000
-        }
     ]
     const tokens = [
         {
             tokenId: tokenId,
-            tokenAddress: 'xxx'
+            tokenAddress: 'xxx',
+            tokenName: '$PAW'
         }
     ]
     await StakingVaultsSchema.create({ projectId: projectId, stakingOptions: stakingOptions, tokens: tokens })
