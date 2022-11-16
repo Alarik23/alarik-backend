@@ -1,4 +1,5 @@
 import { clusterApiUrl, Connection, LAMPORTS_PER_SOL } from "@solana/web3.js"
+import config from "../config.js"
 import ProjectsSchema from "../database/projectsSchema.js"
 import RaffleEntrySchema from "../database/raffles/raffleEntrySchema.js"
 import RaffleSchema from "../database/raffles/rafflesSchema.js"
@@ -22,7 +23,7 @@ export const enterRaffle = async (req, res) => {
         const alreadyUsedTransaction = await UsedTransactionsSchema.findOne({ transactionSignature: signature })
         if (alreadyUsedTransaction) return res.json({ error: "Already Used Transaction." })
         if (raffleEntryTypeInRaffle.type === "SOL") {
-            const connection = new Connection('https://wider-falling-firefly.solana-mainnet.discover.quiknode.pro/9bcba0c1c16d1435fe07126ee2790a679cdd78aa/')
+            const connection = new Connection(config.rpcURL)
             // const connection = new Connection(clusterApiUrl('mainnet-beta'))
             let transaction = await connection.getParsedTransaction(signature, 'confirmed')
             if (!transaction) transaction = await connection.getParsedTransaction(signature, 'finalized')

@@ -13,8 +13,10 @@
     "@metaplex-foundation/js": "^0.17.1",
     "@solana/spl-token": "^0.3.6",
     "@solana/web3.js": "^1.66.1",
+    "bs58": "^5.0.0",
     "cors": "^2.8.5",
     "express": "^4.18.2",
-    "mongoose": "^6.6.5"
+    "mongoose": "^6.6.5",
+    "tweetnacl": "^1.0.3"
   }
 }
